@@ -598,21 +598,19 @@ def translate_query(query):
     ans = []
     for q in queries:
         split = q.split(':', 1)
-        logger.debug("Nested split: %s" % split)
-        if (q.startswith('src:')):
+        if (len(split)>1):
+            logger.debug("Nested split: %s" % split)
+            if (split[0] == 'from'):
+                split[0] = 'submitter'
             ans.extend(split)
-        elif (q.startswith('from:')):
-            ans.extend(['submitter', split[1]])
-        elif (q.startswith('severity:')):
-            ans.extend(split)
-        elif (q.startswith('tag:')):
-            ans.extend(split)
-        elif (q.find("@") != -1):
-            ans.extend(['maint', q])
-        elif (re.match("^[0-9]*$", q)):
-            ans.extend([None, q])
         else:
-            ans.extend(['package', q])
+            if (q.find("@") != -1):
+                ans.extend(['maint', q])
+            elif (re.match("^[0-9]*$", q)):
+                ans.extend([None, q])
+            else:
+                ans.extend(['package', q])
+
     logger.debug("Translated query to %s" % ans)
     return ans
 

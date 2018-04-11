@@ -26,6 +26,7 @@ from ui import mainwindow
 from ui import submitdialog
 import rnghelpers as rng
 import debianbts as bts
+from pysimplesoap.client import SoapFault
 from rngsettingsdialog import RngSettingsDialog
 import bug
 
@@ -181,7 +182,12 @@ class RngGui(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
                     query[i+1] = realname
         # Single bug or list of bugs?
         if query[0]:
-            buglist = bts.get_bugs(query)
+            try:
+                buglist = bts.get_bugs(query)
+            except SoapFault as soap_error:
+                buglist = []
+                # Logging is already done elsewhere, so we don't need to do
+                # anything with soap_error, besides maybe displaying the error?
         else:
             buglist = [query[1]]
         # ok, we know the package, so enable some buttons which don't depend
